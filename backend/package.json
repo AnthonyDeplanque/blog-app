@@ -1,5 +1,5 @@
 {
-  "name": "checkpoint4",
+  "name": "backend",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
