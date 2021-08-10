@@ -1,0 +1,51 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS news;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS images;
+DROP TABLE IF EXISTS imageInNews;
+
+CREATE TABLE IF NOT EXISTS users(
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nickName` VARCHAR(80) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `hashedPassword` VARCHAR(150) NOT NULL,
+  `role` INT NOT NULL,
+  `firstName` VARCHAR(64),
+  `lastName` VARCHAR(64),
+  `dateOfInscription` BIGINT NOT NULL,
+  `bio` TEXT NOT NULL,
+  `image` TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS news(
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `idCategory` INT NOT NULL,
+  `idUser` INT NOT NULL,
+  `date` BIGINT NOT NULL,
+  `content` LONGTEXT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS categories(
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS images(
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `link` TEXT NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS imageInNews(
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `idNews` INT NOT NULL,
+  `idImage` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (idNews) REFERENCES news(id) ON DELETE CASCADE,
+  FOREIGN KEY (idImage) REFERENCES images(id) ON DELETE CASCADE
+);
