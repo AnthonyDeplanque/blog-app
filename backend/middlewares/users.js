@@ -23,4 +23,8 @@ const updateUserValidationObject = {
   bio: Joi.string(),
   image: Joi.string(),
 };
-module.exports = {postUserValidationObject, updateUserValidationObject};
+const loginUserValidationObject = {
+  email: Joi.string().email({ minDomainSegments: 2 }).max(100).required(),
+  password: Joi.string().max(150).required(),
+}
+module.exports = {postUserValidationObject, updateUserValidationObject, loginUserValidationObject};
