@@ -22,6 +22,7 @@ const getSelectedUsersQuery = (first, last) => {
 const updateUserQuery = (id, values) => {
   return db.query("UPDATE users SET ? WHERE id = ?", [values, id]);
 };
+
 const deleteUserQuery = (values) => {
   return db.query("DELETE FROM users WHERE id = ?", [values]);
 };

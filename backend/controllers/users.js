@@ -162,6 +162,7 @@ const getAllUsers = (req, res) => {
 
 const getOneUserById = (req, res) => {
   const { id } = req.params;
+
   usersModel
     .getOneUserQueryById(id)
     .then(([[results]]) => {
@@ -175,15 +176,86 @@ const getOneUserById = (req, res) => {
     });
 };
 
+const updateUser = async (req, res) => {
+  const { id } = req.params;
+  const validationErrors = Joi.object(
+    usersMiddleware.updateUserValidationObject
+  ).validate(req.body, { abortEarly: false }).error;
+  usersModel.getOneUserQueryById(id).then(([[results]]) => {
+    if (!results) {
+      res.status(404).json({ message: `user with id ${id} not found` });
+    } else {
+      if (validationErrors) {
+        console.error(validationErrors.details[0].message);
+        res.status(403).json(validationErrors);
+      } else {
+        usersModel
+          .updateUserQuery(id, req.body)
+          .then(([results]) => {
+            res
+              .status(200)
+              .json({ ...results, message: `user ${id} successfully updated` });
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(500).json({ message: `error updating user ${id}` });
+          });
+      }
+    }
+  });
+};
+
+const updateUserPassword = async (req, res) => {
+  const { id } = req.params;
+  const { password } = req.body;
+  if (!password) {
+    res
+      .status(403)
+      .json({
+        message: `check your credentials ! you sent ${Object.keys(
+          req.body
+        )} instead of password`,
+      });
+  }
+  const hashedPassword = password ? await argon2.hash(password) : null;
+  const validationError = Joi.object(
+    usersMiddleware.updateUserPasswordValidationObject
+  ).validate({ hashedPassword: hashedPassword }, { abortEarly: false }).error;
+  if (validationError) {
+    res.status(500).json({ ...validationError });
+  } else {
+    usersModel
+      .getOneUserQueryById(id)
+      .then(([[results]]) => {
+        if (results) {
+          usersModel
+            .updateUserQuery(id, { hashedPassword })
+            .then(([results]) =>
+              res.status(201).json({
+                ...results,
+                message: `password for user ${id} successfully updated`,
+              })
+            )
+            .catch((error) => res.status(500).json({ message: error }));
+        } else
+          res.status(404).json({ message: `user with id ${id} not found` });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ message: error });
+      });
+  }
+};
+
 const deleteUser = (req, res) => {
   const { id } = req.params;
   usersModel
     .deleteUserQuery(id)
     .then((results) => {
       if (results.affectedRows) {
-        res.status(200).json({message: `user with id ${id} deleted` });
+        res.status(200).json({ message: `user with id ${id} deleted` });
       } else {
-        res.status(404).json({message: `user with id ${id} not found` });
+        res.status(404).json({ message: `user with id ${id} not found` });
       }
     })
     .catch((error) => {
@@ -196,5 +268,7 @@ module.exports = {
   loginUser,
   getAllUsers,
   getOneUserById,
+  updateUser,
   deleteUser,
+  updateUserPassword,
 };

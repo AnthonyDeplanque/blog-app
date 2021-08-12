@@ -15,8 +15,6 @@ const postUserValidationObject = {
 const updateUserValidationObject = {
   nickName: Joi.string().max(80),
   email: Joi.string().email({ minDomainSegments: 2 }).max(100),
-
-  hashedPassword: Joi.string().max(150),
   role: Joi.number(),
   firstName: Joi.string().max(64),
   lastName: Joi.string().max(64),
@@ -24,8 +22,11 @@ const updateUserValidationObject = {
   bio: Joi.string(),
   image: Joi.string(),
 };
+const updateUserPasswordValidationObject={
+  hashedPassword : Joi.string().max(150).required()
+};
 const loginUserValidationObject = {
   email: Joi.string().email({ minDomainSegments: 2 }).max(100).required(),
   password: Joi.string().max(150).required(),
 }
-module.exports = {postUserValidationObject, updateUserValidationObject, loginUserValidationObject};
+module.exports = {postUserValidationObject, updateUserValidationObject, updateUserPasswordValidationObject, loginUserValidationObject};
