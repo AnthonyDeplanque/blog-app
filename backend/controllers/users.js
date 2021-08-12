@@ -16,7 +16,12 @@ const postUser = async (req, res) => {
     bio,
     image,
   } = req.body;
-
+  if (!password) {
+    console.error("no password");
+    res.status(500).json({
+      message: "a new user needs a password (check your credentials)!",
+    });
+  }
   const hashedPassword = await argon2.hash(password);
   const { error } = Joi.object(
     usersMiddleware.postUserValidationObject
@@ -56,9 +61,10 @@ const postUser = async (req, res) => {
               bio,
               image,
             })
-            .then((results) => {
-              const idUser = results.insertId;
+            .then(([results]) => {
+              const id = results.insertId;
               const createdUser = {
+                id,
                 nickName,
                 email,
                 hashedPassword,
@@ -115,7 +121,7 @@ const loginUser = (req, res) => {
       })
       .catch((error) => {
         console.error(error);
-        res.status(404).json({ message: "user not found" });
+        res.status(204).json({ message: "user not found" });
       });
   }
 };
@@ -130,7 +136,7 @@ const getAllUsers = (req, res) => {
       })
       .catch((error) => {
         console.error(error);
-        res.status(404).json({ message: `user with email ${email} not found` });
+        res.status(204).json({ message: `user with email ${email} not found` });
       });
   }
   if (first && last) {
@@ -158,10 +164,27 @@ const getOneUserById = (req, res) => {
   const { id } = req.params;
   usersModel
     .getOneUserQueryById(id)
-    .then(([results]) => {
-      if (results.length) {
+    .then(([[results]]) => {
+      if (results) {
         res.status(200).json(results);
       } else res.status(404).json({ message: `user with id ${id} not found` });
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: error });
+    });
+};
+
+const deleteUser = (req, res) => {
+  const { id } = req.params;
+  usersModel
+    .deleteUserQuery(id)
+    .then((results) => {
+      if (results.affectedRows) {
+        res.status(200).json({message: `user with id ${id} deleted` });
+      } else {
+        res.status(404).json({message: `user with id ${id} not found` });
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -173,4 +196,5 @@ module.exports = {
   loginUser,
   getAllUsers,
   getOneUserById,
+  deleteUser,
 };

@@ -5,11 +5,12 @@ const createToken = (payload) => {
   const dateNowForToken = Date.now() / 1000;
   const expiration = Math.floor(dateNowForToken + 60 * 60 * 24);
   const token = jwt.sign(
-    { algotithms: ["HS256"], data: payload, exp: expiration },
+    { data: payload, exp: expiration },
     process.env.JWT_KEY
   );
   return token;
 };
+
 const authWithJwt = expressJwt({
   secret: process.env.JWT_KEY,
   algorithms: ["HS256"],

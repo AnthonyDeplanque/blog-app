@@ -15,6 +15,7 @@ const postUserValidationObject = {
 const updateUserValidationObject = {
   nickName: Joi.string().max(80),
   email: Joi.string().email({ minDomainSegments: 2 }).max(100),
+
   hashedPassword: Joi.string().max(150),
   role: Joi.number(),
   firstName: Joi.string().max(64),
