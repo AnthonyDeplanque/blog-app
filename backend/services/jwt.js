@@ -10,10 +10,12 @@ const createToken = (payload) => {
   );
   return token;
 };
-
+const decodeToken = (token)=>{
+  return jwt.decode(token);
+}
 const authWithJwt = expressJwt({
   secret: process.env.JWT_KEY,
   algorithms: ["HS256"],
 });
 
-module.exports = { createToken, authWithJwt };
+module.exports = { createToken, authWithJwt, decodeToken };

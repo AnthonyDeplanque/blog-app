@@ -126,6 +126,28 @@ const loginUser = (req, res) => {
   }
 };
 
+const getMyProfile = (req, res) => {
+  const { token } = req.body;
+  const timestamp = Math.floor(Date.now() / 1000);
+  const decodedToken = jwtServices.decodeToken(token);
+  const { data, exp } = decodedToken;
+  if (timestamp < exp) {
+    usersModel
+      .getOneUserQueryByEmail(data)
+      .then(([results]) => {
+        res.status(200).json(results);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(204).json({ message: `user with email ${email} not found` });
+      });
+  } else {
+    res
+      .status(200)
+      .json({ message: "connection ended : you need to reconnect" });
+  }
+};
+
 const getAllUsers = (req, res) => {
   const { first, last, email } = req.query;
   if (email) {
@@ -209,13 +231,11 @@ const updateUserPassword = async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
   if (!password) {
-    res
-      .status(403)
-      .json({
-        message: `check your credentials ! you sent ${Object.keys(
-          req.body
-        )} instead of password`,
-      });
+    res.status(403).json({
+      message: `check your credentials ! you sent ${Object.keys(
+        req.body
+      )} instead of password`,
+    });
   }
   const hashedPassword = password ? await argon2.hash(password) : null;
   const validationError = Joi.object(
@@ -271,4 +291,5 @@ module.exports = {
   updateUser,
   deleteUser,
   updateUserPassword,
+  getMyProfile,
 };
