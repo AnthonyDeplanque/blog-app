@@ -17,7 +17,8 @@ const postUser = async (req, res) => {
     image,
   } = req.body;
   const hashedPassword = await argon2.hash(password);
-  const error = Joi.object(usersMiddleware.postUserValidationObject).validate(
+  const error = Joi.object(usersMiddleware.postUserValidationObject)
+  .validate(
     {
       nickName,
       email,
@@ -31,17 +32,14 @@ const postUser = async (req, res) => {
     },
     { abortEarly: false }
   );
-  if (error) {
-    console.error(error);
-    res.status(422).json({ validationError: error.details });
-  } else {
+
     usersModel.getOneUserQueryByEmail(email).then(([result]) => {
       if (result.length) {
         res.status(409).send("Email already used");
       } else {
         usersModel
           .addUserQuery({
-            nickname,
+            nickName,
             email,
             hashedPassword,
             role,
@@ -52,7 +50,7 @@ const postUser = async (req, res) => {
             image,
           })
           .then((results) => {
-            const idUser = results.insertId();
+            const idUser = results.insertId;
             const createdUser = {
               idUser,
               nickName,
@@ -73,7 +71,7 @@ const postUser = async (req, res) => {
           });
       }
     });
-  }
+
 };
 
 const loginUser = (req, res) => {
@@ -82,17 +80,17 @@ const loginUser = (req, res) => {
     .getHashedPasswordByEmail(credentialEmail)
     .then(async ([[results]]) => {
       argon2
-        .verify(result.hashedPassword, credentialPassword)
+        .verify(results.hashedPassword, credentialPassword)
         .then((match) => {
           if (match) {
             usersModel
               .getOneUserQueryByEmail(credentialEmail)
-              .then(([[results]]) => {
-                const token = jwtServices.createToken(results.id); // not yet tested
+              .then(([[result]]) => {
+               const token = jwtServices.createToken(result.email); // not yet tested
                 res
                   .status(200)
                   .json({
-                    ...results,
+                    ...result,
                     token: token,
                     message: "ACCESS_GRANTED",
                   });
