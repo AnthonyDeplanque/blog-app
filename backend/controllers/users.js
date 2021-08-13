@@ -19,7 +19,7 @@ const postUser = async (req, res) => {
   if (!password) {
     console.error("no password");
     res.status(500).json({
-      message: "a new user needs a password (check your credentials)!",
+      message: 'SERVER_ERROR',detail:"a new user needs a password (check your credentials) !",
     });
   }
   const hashedPassword = await argon2.hash(password);
