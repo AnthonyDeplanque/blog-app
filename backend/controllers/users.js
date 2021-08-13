@@ -312,7 +312,7 @@ const deleteUser = (req, res) => {
   const { id } = req.params;
   usersModel
     .deleteUserQuery(id)
-    .then((results) => {
+    .then(([results]) => {
       if (results.affectedRows) {
         res.status(200).json({
           message: "REQUEST_OK",
