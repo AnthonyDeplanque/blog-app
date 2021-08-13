@@ -9,7 +9,7 @@ const postUserValidationObject = {
   lastName: Joi.string().max(64).required(),
   date: Joi.number().required(),
   bio: Joi.string().required(),
-  image: Joi.string().required(),
+  image: Joi.string().required().allow(null, ""),
 };
 
 const updateUserValidationObject = {
