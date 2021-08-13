@@ -1,10 +1,12 @@
 const multer = require("multer");
+const usersModel = require('../models/users')
 
-const storage = require("../services/multer");
-const upload = multer({ storage }).single("file");
+const {storageForNews, storageForUsers} = require("../services/multer");
+const uploadNews = multer({ storageForNews }).single("file");
+const uploadAvatar = multer({ storageForUsers }).single("file");
 
-const uploadImage = (req, res) => {
-  upload(req, res, (err) => {
+const uploadImageForNews = (req, res) => {
+  uploadNews(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       console.error(err);
       res.status(500).json(err);
@@ -18,5 +20,21 @@ const uploadImage = (req, res) => {
     }
   });
 };
+const uploadImageForUser = (req, res) => {
+  uploadAvatar(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      console.error(err);
+      res.status(500).json(err);
+    } else if (err) {
+      console.error(err);
+      res.status(500).json(err);
+    } else {
+      const {id} = req.params;
+      const { path } = req.file;
+      usersModel.updateUserQuery(id, { image: path });
+      res.status(200).send(req.file);
+    }
+  });
+};
 
-module.exports = { uploadImage };
+module.exports = { uploadImageForNews, uploadImageForUser };
