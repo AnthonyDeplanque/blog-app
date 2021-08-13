@@ -91,7 +91,11 @@ const postUser = async (req, res) => {
             });
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {console.error(err)
+        res.status(500).json({
+          message:'SERVER_ERROR',
+          detail:'error retrieving a user'
+        });});
   }
 };
 
@@ -141,7 +145,7 @@ const getMyProfile = (req, res) => {
     if (timestamp < exp) {
       usersModel
         .getOneUserQueryByEmail(data)
-        .then(([results]) => {
+        .then(([[results]]) => {
           res.status(200).json({ ...results, expirationTimestamp: exp * 1000 });
         })
         .catch((error) => {
@@ -169,7 +173,7 @@ const getAllUsers = (req, res) => {
   if (email) {
     usersModel
       .getOneUserQueryByEmail(email)
-      .then(([results]) => {
+      .then(([[results]]) => {
         res.status(200).json(results);
       })
       .catch((error) => {
@@ -182,7 +186,7 @@ const getAllUsers = (req, res) => {
   }
   if (first && last) {
     usersModel
-      .getSelectedUsersQuery(first, last)
+      .getSelectedUsersQuery(+first, +last)
       .then(([results]) => {
         res.status(200).json(...results);
       })
@@ -212,9 +216,9 @@ const getOneUserById = (req, res) => {
       } else
         res
           .status(404)
-          .json(
-            { message: `NOT_FOUND` },
-            { detail: `user with id ${id} not found` }
+          .json({
+             message: `NOT_FOUND` ,
+             detail: `user with id ${id} not found` }
           );
     })
     .catch((error) => {
@@ -244,14 +248,14 @@ const updateUser = async (req, res) => {
             res.status(200).json({
               ...results,
               message: "REQUEST_OK",
-              details: `user ${id} successfully updated`,
+              detail: `user ${id} successfully updated`,
             });
           })
           .catch((error) => {
             console.error(error);
             res.status(500).json(
-              { message: "SERVER_ERROR" },
-              {
+              { message: "SERVER_ERROR" ,
+              
                 detail: { error: error, message: `error updating user ${id}` },
               }
             );
