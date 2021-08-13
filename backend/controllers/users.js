@@ -47,7 +47,7 @@ const postUser = async (req, res) => {
       .getOneUserQueryByEmail(email)
       .then(([results]) => {
         if (results.length) {
-          res.status(409).json({ message: "email already in use" });
+          res.status(409).json({ message: "EMAIL_ALREADY_USED" });
         } else {
           usersModel
             .addUserQuery({
@@ -75,13 +75,18 @@ const postUser = async (req, res) => {
                 bio,
                 image,
               };
-              res
-                .status(201)
-                .json({ ...createdUser, message: "user successfully created" });
+              res.status(201).json({
+                ...createdUser,
+                message: "REQUEST_OK",
+                detail: "User successfully created",
+              });
             })
             .catch((err) => {
               console.error(err);
-              res.status(500).json({ message: "error creating a user" });
+              res.status(500).json({
+                message: "SERVER_ERROR",
+                detail: "error creating a user",
+              });
             });
         }
       })
@@ -121,7 +126,7 @@ const loginUser = (req, res) => {
       })
       .catch((error) => {
         console.error(error);
-        res.status(204).json({ message: "user not found" });
+        res.status(204).json({ message: "ACCESS_DENIED" });
       });
   }
 };
@@ -135,16 +140,19 @@ const getMyProfile = (req, res) => {
     usersModel
       .getOneUserQueryByEmail(data)
       .then(([results]) => {
-        res.status(200).json(results);
+        res.status(200).json({...results, expirationTimestamp:exp*1000});
       })
       .catch((error) => {
         console.error(error);
-        res.status(204).json({ message: `user with email ${email} not found` });
+        res.status(204).json({
+          message: `NOT_FOUND`,
+          detail: `user with email ${email} not found`,
+        });
       });
   } else {
     res
       .status(200)
-      .json({ message: "connection ended : you need to reconnect" });
+      .json({ message: "RECONNECTION_NEEDED", detail: "Token expired" });
   }
 };
 
@@ -158,18 +166,21 @@ const getAllUsers = (req, res) => {
       })
       .catch((error) => {
         console.error(error);
-        res.status(204).json({ message: `user with email ${email} not found` });
+        res.status(204).json({
+          message: `NOT_FOUND`,
+          detail: `user with email ${email} not found`,
+        });
       });
   }
   if (first && last) {
     usersModel
       .getSelectedUsersQuery(first, last)
       .then(([results]) => {
-        res.status(200).json(results);
+        res.status(200).json(...results);
       })
       .catch((error) => {
         console.error(error);
-        res.status(500).json({ message: error });
+        res.status(500).json({ message: "SERVER_ERROR", detail: error });
       });
   } else {
     usersModel
@@ -177,7 +188,7 @@ const getAllUsers = (req, res) => {
       .then(([results]) => res.status(200).json(results))
       .catch((error) => {
         console.error(error);
-        res.status(500).json({ message: error });
+        res.status(500).json({ message: "SERVER_ERROR", detail: error });
       });
   }
 };
@@ -190,11 +201,17 @@ const getOneUserById = (req, res) => {
     .then(([[results]]) => {
       if (results) {
         res.status(200).json(results);
-      } else res.status(404).json({ message: `user with id ${id} not found` });
+      } else
+        res
+          .status(404)
+          .json(
+            { message: `NOT_FOUND` },
+            { detail: `user with id ${id} not found` }
+          );
     })
     .catch((error) => {
       console.error(error);
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: "SERVER_ERROR", detail: error });
     });
 };
 
@@ -205,7 +222,9 @@ const updateUser = async (req, res) => {
   ).validate(req.body, { abortEarly: false }).error;
   usersModel.getOneUserQueryById(id).then(([[results]]) => {
     if (!results) {
-      res.status(404).json({ message: `user with id ${id} not found` });
+      res
+        .status(404)
+        .json({ message: `NOT_FOUND`, detail: `user with id ${id} not found` });
     } else {
       if (validationErrors) {
         console.error(validationErrors.details[0].message);
@@ -214,13 +233,20 @@ const updateUser = async (req, res) => {
         usersModel
           .updateUserQuery(id, req.body)
           .then(([results]) => {
-            res
-              .status(200)
-              .json({ ...results, message: `user ${id} successfully updated` });
+            res.status(200).json({
+              ...results,
+              message: "REQUEST_OK",
+              details: `user ${id} successfully updated`,
+            });
           })
           .catch((error) => {
             console.error(error);
-            res.status(500).json({ message: `error updating user ${id}` });
+            res.status(500).json(
+              { message: "SERVER_ERROR" },
+              {
+                detail: { error: error, message: `error updating user ${id}` },
+              }
+            );
           });
       }
     }
@@ -256,13 +282,20 @@ const updateUserPassword = async (req, res) => {
                 message: `password for user ${id} successfully updated`,
               })
             )
-            .catch((error) => res.status(500).json({ message: error }));
+            .catch((error) =>
+              res.status(500).json({ message: "SERVER_ERROR", detail: error })
+            );
         } else
-          res.status(404).json({ message: `user with id ${id} not found` });
+          res
+            .status(404)
+            .json(
+              { message: `NOT_FOUND` },
+              { detail: `user with id ${id} not found` }
+            );
       })
       .catch((error) => {
         console.error(error);
-        res.status(500).json({ message: error });
+        res.status(500).json({ message: "SERVER_ERROR" }, { detail: error });
       });
   }
 };
@@ -273,14 +306,23 @@ const deleteUser = (req, res) => {
     .deleteUserQuery(id)
     .then((results) => {
       if (results.affectedRows) {
-        res.status(200).json({ message: `user with id ${id} deleted` });
+        res.status(200).json({
+          message: "REQUEST_OK",
+          detail: `user with id ${id} deleted`,
+        });
       } else {
-        res.status(404).json({ message: `user with id ${id} not found` });
+        res.status(404).json({
+          message: `NOT_FOUND`,
+          detail: `user with id ${id} not found`,
+        });
       }
     })
     .catch((error) => {
       console.error(error);
-      res.status(500).json({ message: error });
+      res.status(500).json({
+        message: "SERVER_ERROR",
+        detail: error,
+      });
     });
 };
 module.exports = {
