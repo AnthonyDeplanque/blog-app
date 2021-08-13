@@ -134,10 +134,11 @@ const loginUser = (req, res) => {
 const getMyProfile = (req, res) => {
   const { token } = req.body;
   const timestamp = Math.floor(Date.now() / 1000);
-  const decodedToken = jwtServices.decodeToken(token);
-  const { data, exp } = decodedToken;
-  if (timestamp < exp) {
-    usersModel
+  try{
+    const decodedToken = jwtServices.decodeToken(token);
+    const { data, exp } = decodedToken;
+    if (timestamp < exp) {
+      usersModel
       .getOneUserQueryByEmail(data)
       .then(([results]) => {
         res.status(200).json({...results, expirationTimestamp:exp*1000});
@@ -149,12 +150,17 @@ const getMyProfile = (req, res) => {
           detail: `user with email ${email} not found`,
         });
       });
-  } else {
-    res
+    } else {
+      res
       .status(200)
       .json({ message: "RECONNECTION_NEEDED", detail: "Token expired" });
+    }
   }
-};
+  catch(error){
+    console.error(error);
+    res.status(500).json({ message: "SERVER_ERROR", detail: "invalid token data"});
+  }
+  };
 
 const getAllUsers = (req, res) => {
   const { first, last, email } = req.query;
