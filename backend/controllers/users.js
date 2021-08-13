@@ -19,7 +19,8 @@ const postUser = async (req, res) => {
   if (!password) {
     console.error("no password");
     res.status(500).json({
-      message: 'SERVER_ERROR',detail:"a new user needs a password (check your credentials) !",
+      message: "SERVER_ERROR",
+      detail: "a new user needs a password (check your credentials) !",
     });
   }
   const hashedPassword = await argon2.hash(password);
@@ -134,33 +135,34 @@ const loginUser = (req, res) => {
 const getMyProfile = (req, res) => {
   const { token } = req.body;
   const timestamp = Math.floor(Date.now() / 1000);
-  try{
+  try {
     const decodedToken = jwtServices.decodeToken(token);
     const { data, exp } = decodedToken;
     if (timestamp < exp) {
       usersModel
-      .getOneUserQueryByEmail(data)
-      .then(([results]) => {
-        res.status(200).json({...results, expirationTimestamp:exp*1000});
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(204).json({
-          message: `NOT_FOUND`,
-          detail: `user with email ${email} not found`,
+        .getOneUserQueryByEmail(data)
+        .then(([results]) => {
+          res.status(200).json({ ...results, expirationTimestamp: exp * 1000 });
+        })
+        .catch((error) => {
+          console.error(error);
+          res.status(204).json({
+            message: `NOT_FOUND`,
+            detail: `user with email ${email} not found`,
+          });
         });
-      });
     } else {
       res
-      .status(200)
-      .json({ message: "RECONNECTION_NEEDED", detail: "Token expired" });
+        .status(200)
+        .json({ message: "RECONNECTION_NEEDED", detail: "Token expired" });
     }
-  }
-  catch(error){
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "SERVER_ERROR", detail: "invalid token data"});
+    res
+      .status(500)
+      .json({ message: "SERVER_ERROR", detail: "invalid token data" });
   }
-  };
+};
 
 const getAllUsers = (req, res) => {
   const { first, last, email } = req.query;
