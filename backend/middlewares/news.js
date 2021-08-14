@@ -15,4 +15,4 @@ const updateNewsValidationObject = {
   date: Joi.number(),
   content: Joi.string(),
 };
-module.exports={postNewsValidationObject, updateNewsValidationObject};
+module.exports = { postNewsValidationObject, updateNewsValidationObject };
