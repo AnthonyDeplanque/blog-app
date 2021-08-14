@@ -9,6 +9,7 @@ const port = process.env.PORT || 1234;
 
 app.use(cors());
 app.use(express.json());
+app.use('/file-storage', express.static('file-storage'));
 
 router(app);
 

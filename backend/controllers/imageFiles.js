@@ -1,12 +1,28 @@
 const multer = require("multer");
-const usersModel = require('../models/users')
+const path = require('path');
 
-const {storageForNews, storageForUsers} = require("../services/multer");
-const uploadNews = multer({ storageForNews }).single("file");
-const uploadAvatar = multer({ storageForUsers }).single("file");
+const storageImage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, "file-storage/public/images");
+  },
+  filename(req, file, cb) {
+    cb(null, `${file.fieldname+"-"+Date.now()+path.extname(file.originalname)}`);
+  },
+});
+
+const storageAvatar = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, "file-storage/public/avatar");
+  },
+  filename(req, file, cb) {
+    cb(null, `${file.fieldname+"-"+Date.now()+path.extname(file.originalname)}`);
+  },
+});
+const uploadImage = multer({ storage:storageImage }).single("image");
+const uploadAvatar = multer({storage:storageAvatar}).single("avatar");
 
 const uploadImageForNews = (req, res) => {
-  uploadNews(req, res, (err) => {
+  uploadImage(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       console.error(err);
       res.status(500).json(err);
@@ -14,27 +30,22 @@ const uploadImageForNews = (req, res) => {
       console.error(err);
       res.status(500).json(err);
     } else {
-      const { path } = req.file;
-      // SQL QUERY updateNewsQuery(id, { image: path });
-      res.status(200).send(req.file);
+      res.status(200).json({file : req.file});
     }
   });
 };
-const uploadImageForUser = (req, res) => {
-  uploadAvatar(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
+const uploadAvatarForUser = (req,res) =>{
+  uploadAvatar(req,res,(err)=>{
+    if (err instanceof multer.MulterError){
       console.error(err);
-      res.status(500).json(err);
+      res.status(500).json({message:"MULTER_ERRROR", detail:err});
     } else if (err) {
       console.error(err);
-      res.status(500).json(err);
+      res.status(500).json({message:'SERVER_ERROR', detail:err});
     } else {
-      const {id} = req.params;
-      const { path } = req.file;
-      usersModel.updateUserQuery(id, { image: path });
-      res.status(200).send(req.file);
+      res.status(200).json({file:req.file})
     }
-  });
-};
+  })
+}
 
-module.exports = { uploadImageForNews, uploadImageForUser };
+module.exports = { uploadImageForNews, uploadAvatarForUser };
