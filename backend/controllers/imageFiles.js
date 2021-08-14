@@ -1,23 +1,7 @@
 const multer = require("multer");
-const path = require('path');
 
-const storageImage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "file-storage/public/images");
-  },
-  filename(req, file, cb) {
-    cb(null, `${file.fieldname+"-"+Date.now()+path.extname(file.originalname)}`);
-  },
-});
+const {storageImage, storageAvatar} =require('../services/multerStorage');
 
-const storageAvatar = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "file-storage/public/avatar");
-  },
-  filename(req, file, cb) {
-    cb(null, `${file.fieldname+"-"+Date.now()+path.extname(file.originalname)}`);
-  },
-});
 const uploadImage = multer({ storage:storageImage }).single("image");
 const uploadAvatar = multer({storage:storageAvatar}).single("avatar");
 
