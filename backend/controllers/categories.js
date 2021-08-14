@@ -69,7 +69,7 @@ const getAllCategories = (req, res) => {
     categoriesModel
       .getSelectedCategoriesQuery(+first, +last)
       .then(([results]) => {
-        res.status(200).json(...results);
+        res.status(200).json(results);
       })
       .catch((error) => {
         console.error(error);

@@ -11,13 +11,13 @@ const getOneImageQueryById = (id) => {
   return db.query("SELECT * FROM images WHERE id = ?", [id]);
 };
 const getSelectedImagesQuery = (first, last) => {
-  return db.query("SELECT * FROM images LIMIT ?, ?"[(first, last)]);
+  return db.query("SELECT * FROM images LIMIT ? , ?", [first, last]);
 };
 const updateImageQuery = (id, values) => {
-  return db.query("UPDATE image SET ? WHERE id = ?", [values, id]);
+  return db.query("UPDATE images SET ? WHERE id = ?", [values, id]);
 };
 const deleteImageQuery = (id) => {
-  return db.query("DELETE FROM images WUERE id = ?", id);
+  return db.query("DELETE FROM images WHERE id = ?", id);
 };
 
 module.exports = {

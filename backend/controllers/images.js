@@ -89,7 +89,7 @@ const updateImage = (req, res) => {
         .status(404)
         .json({
           message: "NOT_FOUND",
-          details: `image with id ${id} not found`,
+          detail: `image with id ${id} not found`,
         });
     } else {
       if (validationError) {
