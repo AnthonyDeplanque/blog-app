@@ -1,5 +1,4 @@
 /* Replace with your SQL commands */
-SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION';
 
 CREATE TABLE IF NOT EXISTS users(
   `id` INT NOT NULL AUTO_INCREMENT,
