@@ -9,7 +9,7 @@ const router = (app) =>{
   app.use('/api/categories', categoriesRouter);
   app.use('/api/news', newsRouter);
   app.use('/api/images', imagesRouter);
-  app.use('/test/upload', imagesUploadRouter);
+  app.use('/api/upload', imagesUploadRouter);
 }
 
 module.exports={router};
