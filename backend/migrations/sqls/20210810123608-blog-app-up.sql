@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users(
   `lastName` VARCHAR(64),
   `date` BIGINT NOT NULL,
   `bio` TEXT NOT NULL,
-  `image` TEXT NOT NULL,
+  `image` TEXT NULL,
   PRIMARY KEY (`id`)
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS images(
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `description` VARCHAR(255) NOT NULL,
-  `link` TEXT NOT NULL,
+  `link` TEXT NULL,
   PRIMARY KEY (`id`)
 );
 

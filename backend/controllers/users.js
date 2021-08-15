@@ -68,7 +68,6 @@ const postUser = async (req, res) => {
                 id,
                 nickName,
                 email,
-                hashedPassword,
                 role,
                 firstName,
                 lastName,
