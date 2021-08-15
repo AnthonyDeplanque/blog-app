@@ -9,7 +9,7 @@ const postUserValidationObject = {
   lastName: Joi.string().max(64).required(),
   date: Joi.number().required(),
   bio: Joi.string().required(),
-  image: Joi.string().required().allow(null, ""),
+  image: Joi.string().allow(null, ""),
 };
 
 const updateUserValidationObject = {
@@ -20,7 +20,7 @@ const updateUserValidationObject = {
   lastName: Joi.string().max(64),
   date: Joi.number(),
   bio: Joi.string(),
-  image: Joi.string(),
+  image: Joi.string().allow(null, ""),
 };
 const updateUserPasswordValidationObject={
   hashedPassword : Joi.string().max(150).required()

@@ -8,7 +8,7 @@ const postImageValidationObject = {
 const updateImageValidationObject = {
   name: Joi.string().max(255),
   description: Joi.string().max(255),
-  link: Joi.string(),
+  link: Joi.string().allow(null, ""),
 };
 
 module.exports = { postImageValidationObject, updateImageValidationObject };
