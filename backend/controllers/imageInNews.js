@@ -41,7 +41,7 @@ const getAllImageInNews = (req, res) => {
       detail: "You have to choose bewteen idNews and idImage",
     });
   }
-  if (idNews) {
+  else if (idNews) {
     imageInNewsModel
       .getImageInNewsByNewsIdQuery(+idNews)
       .then(([results]) => {
@@ -59,7 +59,7 @@ const getAllImageInNews = (req, res) => {
         res.status(500).json({ message: "SERVER_ERROR", detail: error });
       });
   }
-  if (idImage) {
+  else if (idImage) {
     imageInNewsModel
       .getImageInNewsByImageIdQuery(+idImage)
       .then(([results]) => {

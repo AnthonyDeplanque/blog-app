@@ -116,50 +116,54 @@ const updateComment = (req, res) => {
         detail: `comment with id ${id} not found`,
       });
     } else {
-      if (validationError){
+      if (validationError) {
         console.error(validationError.details[0].error);
         res.status(403).json(validationError);
       } else {
-        commentsModel.updateCommentQuery(id, req.body).then(([results])=>{
-          res.status(200).json({
-            ...results,
-            message:"REQUEST_OK",
-            detail : `comment with id ${id} successfully updated`
+        commentsModel
+          .updateCommentQuery(id, req.body)
+          .then(([results]) => {
+            res.status(200).json({
+              ...results,
+              message: "REQUEST_OK",
+              detail: `comment with id ${id} successfully updated`,
+            });
           })
-        })
-        .catch(error=>{
-          console.error(error);
-          res.status(500).json({
-            message: "SERVER_ERROR",
-            detail: {
-              error: error,
-              message: `error updating comment ${id}`,
-            },
+          .catch((error) => {
+            console.error(error);
+            res.status(500).json({
+              message: "SERVER_ERROR",
+              detail: {
+                error: error,
+                message: `error updating comment ${id}`,
+              },
+            });
           });
-        })
       }
     }
   });
 };
 const deleteComment = (req, res) => {
   const { id } = req.params;
-  commentsModel.deleteCommentQuery(id).then(([results])=>{
-    if (results.affectedRows){
-      res.status(201).json({
-        message:"REQUEST_OK",
-        detail :`comment ${id} successfully deleted`
-      });
-    } else {
-      res.status(404).json({
-        message:"NOT_FOUND",
-        detail:`comment ${id} not found`
-      })
-    }
-  })
-  .catch(error=>{
-    console.error(error);
-    res.status(500).json({message:'SERVER_ERROR', detail:error})
-  })
+  commentsModel
+    .deleteCommentQuery(id)
+    .then(([results]) => {
+      if (results.affectedRows) {
+        res.status(201).json({
+          message: "REQUEST_OK",
+          detail: `comment ${id} successfully deleted`,
+        });
+      } else {
+        res.status(404).json({
+          message: "NOT_FOUND",
+          detail: `comment ${id} not found`,
+        });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ message: "SERVER_ERROR", detail: error });
+    });
 };
 
 module.exports = {
